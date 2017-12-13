@@ -1,0 +1,44 @@
+{
+  "users": [
+    {
+      "username": "wwhite",
+      "email": "wwhite@victorops.com",
+      "firstName": "Walter",
+      "lastName": "White",
+      "phone": "123-456-7890",
+      "roles": {
+        "organization": {
+          "role": "admin"
+        },
+        "teams": [
+          {
+            "team" : "cooks",
+            "role" : "admin"
+          },
+          {
+            "team" : "professors",
+            "role" : "member"
+          }
+        ]
+      }
+    },
+    {
+      "username": "jpinkman",
+      "email": "jpinkman@victorops.com",
+      "firstName": "Jesse",
+      "lastName": "Pinkman",
+      "phone": "123-456-7891",
+      "roles": {
+        "organization": {
+          "role": "user"
+        },
+        "teams": [
+          {
+            "team" : "cooks",
+            "role" : "member"
+          }
+        ]
+      }
+    }
+  ]
+}

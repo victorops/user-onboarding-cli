@@ -1,0 +1,118 @@
+#!/usr/bin/env python
+"""onboard_victorops_user"""
+
+import sys
+import argparse
+import urllib2
+import csv
+import json
+
+__VERSION__ = '1.0'
+# __BASEURL__ = 'https://api.victorops.com'
+__BASEURL__ = 'http://localhost:3000'
+def main():
+    """Main function"""
+    parser = VoParser(prog='onboard_victorops_user')
+    setup_parser(parser)
+    args = parser.parse_args()
+    data = handle_args(args)
+
+    post_to_victorops(args.apiId, args.apiKey, data)
+
+def handle_args(args):
+    """ Routes args by format """
+    if hasattr(args, 'csv'): # TODO: FIX ME!
+        return handle_csv(args.csv)
+    elif hasattr(args, 'json'):
+        return json.dumps(open_json(args.json))
+    else:
+        return args_to_json(args)
+
+def post_to_victorops(apiid, apikey, data):
+    """ Attempts to post JSON payload to VictorOps """
+    head = {'Content-type': 'application/json', 'Accept': 'application/json',
+            'X-VO-API-ID': apiid, 'X-VO-API-KEY': apikey}
+    req = urllib2.Request(__BASEURL__+'/api-public/v1/users/batch', data, headers=head)
+    try:
+        res = urllib2.urlopen(req)
+    except urllib2.HTTPError as err:
+        print err, "- Failed to send to VictorOps"
+    except urllib2.URLError as err:
+        print err, "- Failed to send to VictorOps"
+    else:
+        print res.read()
+        return res
+
+def args_to_json(args):
+    """ Converts args to a VictorOps Account json"""
+    teams = []
+    for team in args.teams.split(','):
+        teamrole = team.split(':')
+        teams.append({'team': teamrole[0], 'role': teamrole[1]})
+
+    return json.dumps({"users": [{'username': args.username, 'email': args.email,
+                                  'firstName': args.firstName, 'lastName': args.lastName,
+                                  'phone': args.phone, 'roles': {
+                                      'organization': {'role': args.orgRole},
+                                      'teams': teams}}]})
+
+def handle_csv(infile):
+    """ Open and validates csv file """
+    with open(infile, 'rb') as csvfile:
+        users = []
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            teamroles = []
+            for team in row['teams'].split(','):
+                teamrole = team.split(':')
+                teamroles.append({'team': teamrole[0], 'role': teamrole[1]})
+            row['teams'] = teamroles
+            userjson = {'username': row['username'], 'email': row['email'],
+                        'firstName': row['firstName'], 'lastName': row['lastName'],
+                        'phone': row['phone'], 'roles': {
+                            'organization': {'role': row['orgRole']},
+                            'teams': row['teams']}}
+            users.append(userjson)
+            print userjson
+        return json.dumps({'users': users})
+
+def open_json(infile):
+    """ Opens and validates json file """
+    with open(infile, 'rb') as jsonfile:
+        return json.load(jsonfile)
+
+def setup_parser(parser):
+    """Initializes parser"""
+    subparsers = parser.add_subparsers(help='Import users from:')
+    parser.add_argument('-v', '-version', action='version', version=__VERSION__)
+
+    parent_parser = argparse.ArgumentParser(add_help=False)
+    parent_parser.add_argument('-apiId', required=True, help='e.g. -apiId  abcdef12')
+    parent_parser.add_argument('-apiKey', required=True, help='e.g. -apiKey  abcdef12')
+
+    csv_parser = subparsers.add_parser('csv', parents=[parent_parser], help='csv file')
+    json_parser = subparsers.add_parser('json', parents=[parent_parser], help='json file')
+    cli_parser = subparsers.add_parser('create', parents=[parent_parser], help='command line')
+
+    cli_parser.add_argument('-username', required=True, help='e.g. -username wwhite')
+    cli_parser.add_argument('-email', required=True, help='e.g. -email wwhite@victorops.com')
+    cli_parser.add_argument('-firstName', required=True, help='e.g. -firstName Walter')
+    cli_parser.add_argument('-lastName', required=True, help='e.g. -lastName White')
+    cli_parser.add_argument('-phone', required=True, help='e.g. -phone 123-456-7890')
+    cli_parser.add_argument('-orgRole', required=True, choices=['admin', 'user'],
+                            help='e.g. -orgRole admin')
+    cli_parser.add_argument('-teams', required=True, help='e.g. -teams team1:admin,team2:member')
+    csv_parser.add_argument('-f', required=True, dest='csv', help='e.g. -f <foo.csv>')
+    json_parser.add_argument('-f', required=True, dest='json', help='e.g. -f <foo.json>')
+
+    return parser
+
+class VoParser(argparse.ArgumentParser):
+    """ Adds better error handling to standard argument parser """
+    def error(self, message):
+        sys.stderr.write('error: %s\n' % message)
+        self.print_help()
+        sys.exit(2)
+
+if __name__ == "__main__":
+    main()
