@@ -31,7 +31,7 @@ def post_to_victorops(apiid, apikey, data):
     """ Attempts to post JSON payload to VictorOps """
     head = {'Content-type': 'application/json', 'Accept': 'application/json',
             'X-VO-API-ID': apiid, 'X-VO-API-KEY': apikey}
-    req = urllib2.Request(__BASEURL__+'/api-public/v1/users/batch', data, headers=head)
+    req = urllib2.Request(__BASEURL__+'/api-public/v1/user/batch', data, headers=head)
     try:
         res = urllib2.urlopen(req)
     except urllib2.HTTPError as err:
