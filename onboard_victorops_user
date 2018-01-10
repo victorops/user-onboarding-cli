@@ -9,6 +9,7 @@ import json
 
 __VERSION__ = '1.0'
 __BASEURL__ = 'https://api.victorops.com'
+
 def main():
     """Main function"""
     parser = VoParser(prog='onboard_victorops_user')
@@ -31,7 +32,7 @@ def post_to_victorops(apiid, apikey, data):
     """ Attempts to post JSON payload to VictorOps """
     head = {'Content-type': 'application/json', 'Accept': 'application/json',
             'X-VO-API-ID': apiid, 'X-VO-API-KEY': apikey}
-    req = urllib2.Request(__BASEURL__+'/api-public/v1/user/batch', data, headers=head)
+    req = urllib2.Request(__BASEURL__+'/api-public/v1/users/batch', data, headers=head)
     try:
         res = urllib2.urlopen(req)
     except urllib2.HTTPError as err:
@@ -46,11 +47,14 @@ def args_to_json(args):
     """ Converts args to a VictorOps Account json"""
     teams = []
     for team in args.teams.split(','):
-        teams.append({'team': team})
+        teamrole = team.split(':')
+        teams.append({'team': teamrole[0], 'role': teamrole[1]})
 
     return json.dumps({"users": [{'username': args.username, 'email': args.email,
                                   'firstName': args.firstName, 'lastName': args.lastName,
-                                  'phone': args.phone, 'roles': {'teams': teams}}]})
+                                  'phone': args.phone, 'roles': {
+                                      'organization': {'role': args.orgRole},
+                                      'teams': teams}}]})
 
 def handle_csv(infile):
     """ Open and validates csv file """
@@ -58,14 +62,18 @@ def handle_csv(infile):
         users = []
         reader = csv.DictReader(csvfile)
         for row in reader:
-            teams = []
+            teamroles = []
             for team in row['teams'].split(','):
-                teams.append({'team': team})
-            row['teams'] = teams
+                teamrole = team.split(':')
+                teamroles.append({'team': teamrole[0], 'role': teamrole[1]})
+            row['teams'] = teamroles
             userjson = {'username': row['username'], 'email': row['email'],
                         'firstName': row['firstName'], 'lastName': row['lastName'],
-                        'phone': row['phone'], 'roles': {'teams': row['teams']}}
+                        'phone': row['phone'], 'roles': {
+                            'organization': {'role': row['orgRole']},
+                            'teams': row['teams']}}
             users.append(userjson)
+            print userjson
         return json.dumps({'users': users})
 
 def open_json(infile):
@@ -91,7 +99,9 @@ def setup_parser(parser):
     cli_parser.add_argument('-firstName', required=True, help='e.g. -firstName Walter')
     cli_parser.add_argument('-lastName', required=True, help='e.g. -lastName White')
     cli_parser.add_argument('-phone', required=True, help='e.g. -phone 123-456-7890')
-    cli_parser.add_argument('-teams', required=True, help='e.g. -teams team1,team2')
+    cli_parser.add_argument('-orgRole', required=True, choices=['admin', 'team_admin', 'member'],
+                            help='e.g. -orgRole admin')
+    cli_parser.add_argument('-teams', required=True, help='e.g. -teams team1:team_admin,team2:member')
     csv_parser.add_argument('-f', required=True, dest='csv', help='e.g. -f <foo.csv>')
     json_parser.add_argument('-f', required=True, dest='json', help='e.g. -f <foo.json>')
 

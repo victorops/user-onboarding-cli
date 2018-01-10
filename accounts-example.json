@@ -7,12 +7,17 @@
       "lastName": "White",
       "phone": "123-456-7890",
       "roles": {
+        "organization": {
+          "role": "admin"
+        },
         "teams": [
           {
-            "team" : "cooks"
+            "team" : "cooks",
+            "role" : "team_admin"
           },
           {
-            "team" : "professors"
+            "team" : "professors",
+            "role" : "member"
           }
         ]
       }
@@ -24,9 +29,13 @@
       "lastName": "Pinkman",
       "phone": "123-456-7891",
       "roles": {
+        "organization": {
+          "role": "member"
+        },
         "teams": [
           {
-            "team" : "cooks"
+            "team" : "cooks",
+            "role" : "member"
           }
         ]
       }
