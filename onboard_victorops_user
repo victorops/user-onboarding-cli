@@ -32,7 +32,7 @@ def post_to_victorops(apiid, apikey, data):
     """ Attempts to post JSON payload to VictorOps """
     head = {'Content-type': 'application/json', 'Accept': 'application/json',
             'X-VO-API-ID': apiid, 'X-VO-API-KEY': apikey}
-    req = urllib2.Request(__BASEURL__+'/api-public/v1/users/batch', data, headers=head)
+    req = urllib2.Request(__BASEURL__+'/api-public/v1/user/batch', data, headers=head)
     try:
         res = urllib2.urlopen(req)
     except urllib2.HTTPError as err:
@@ -101,7 +101,7 @@ def setup_parser(parser):
     cli_parser.add_argument('-phone', required=True, help='e.g. -phone 123-456-7890')
     cli_parser.add_argument('-orgRole', required=True, choices=['admin', 'team_admin', 'member'],
                             help='e.g. -orgRole admin')
-    cli_parser.add_argument('-teams', required=True, help='e.g. -teams team1:team_admin,team2:member')
+    cli_parser.add_argument('-teams', required=False, help='e.g. -teams team1:team_admin,team2:member')
     csv_parser.add_argument('-f', required=True, dest='csv', help='e.g. -f <foo.csv>')
     json_parser.add_argument('-f', required=True, dest='json', help='e.g. -f <foo.json>')
 
