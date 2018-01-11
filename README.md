@@ -25,3 +25,5 @@ In VictorOps, the following roles are supported when adding members
 
 ## Formats
 Examples of the expected Json and CSV format are in the `accounts-example` files in this repo.
+
+Since the fields of orgAdmin and teams are optional, the fields can be left blank in the CSV or json file.

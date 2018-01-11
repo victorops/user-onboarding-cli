@@ -99,7 +99,7 @@ def setup_parser(parser):
     cli_parser.add_argument('-firstName', required=True, help='e.g. -firstName Walter')
     cli_parser.add_argument('-lastName', required=True, help='e.g. -lastName White')
     cli_parser.add_argument('-phone', required=True, help='e.g. -phone 123-456-7890')
-    cli_parser.add_argument('-orgRole', required=True, choices=['admin', 'team_admin', 'member'],
+    cli_parser.add_argument('-orgRole', required=False, choices=['admin', 'team_admin', 'member'],
                             help='e.g. -orgRole admin')
     cli_parser.add_argument('-teams', required=False, help='e.g. -teams team1:team_admin,team2:member')
     csv_parser.add_argument('-f', required=True, dest='csv', help='e.g. -f <foo.csv>')
