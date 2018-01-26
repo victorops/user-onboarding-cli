@@ -4,13 +4,13 @@ A python script to transform csv/json/arguments into json and posts to create Vi
 ## Usage
 ```sh
 # Manually add one user
-./onboard_victorops_user create -apiId asd -apiKey asd -username foo -email foo@bar.gov -firstName foo -lastName bar -phone 1111111111 -teams team1,team2,team3
+./onboard_victorops_user create --apiId asd --apiKey asd --username foo --email foo@bar.gov --firstName foo --lastName bar --phone 1111111111 --orgRole member --teams team1:member,team2:member
 
 # Upload CSV
-./onboard_victorops_user csv -f accounts-example.csv -apiId abc -apiKey 123
+./onboard_victorops_user csv -f accounts-example.csv --apiId abc --apiKey 123
 
 # Upload JSON
-./onboard_victorops_user json -f accounts-example.json -apiId abc -apiKey 123
+./onboard_victorops_user json -f accounts-example.json --apiId abc --apiKey 123
 ```
 
 ## Roles
