@@ -13,5 +13,17 @@ A python script to transform csv/json/arguments into json and posts to create Vi
 ./onboard_victorops_user json -f accounts-example.json -apiId abc -apiKey 123
 ```
 
+## Roles
+In VictorOps, the following roles are supported when adding members
+* Team
+    * team_admin
+    * member
+* Organization
+    * admin
+    * team_admin
+    * member
+
 ## Formats
 Examples of the expected Json and CSV format are in the `accounts-example` files in this repo.
+
+Since the fields of orgAdmin and teams are optional, the fields can be left blank in the CSV or json file.
