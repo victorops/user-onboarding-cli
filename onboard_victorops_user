@@ -44,7 +44,7 @@ def post_to_victorops(apiid, apikey, data):
     except URLError as err:
         sys.stdout.write(str(err) + " - Failed to send to VictorOps")
     else:
-        sys.stdout.write(str(res.read()))
+        sys.stdout.write(str("Successfully posted to VictorOps"))
         return res
 
 def args_to_json(args):
