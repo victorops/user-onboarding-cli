@@ -10,6 +10,10 @@ except ImportError:
     from urllib2 import urlopen, Request, HTTPError, URLError
 import csv
 import json
+try:
+    import yaml
+except ImportError:
+    pass
 
 __VERSION__ = '1.0'
 __BASEURL__ = 'https://api.victorops.com'
@@ -29,6 +33,8 @@ def handle_args(args):
         return handle_csv(args.csv)
     elif hasattr(args, 'json'):
         return json.dumps(open_json(args.json))
+    elif hasattr(args, 'yaml'):
+        return json.dumps(open_yaml(args.yaml))
     else:
         return args_to_json(args)
 
@@ -85,6 +91,11 @@ def open_json(infile):
     with open(infile, 'rb') as jsonfile:
         return json.load(jsonfile)
 
+def open_yaml(infile):
+    """ Opens and validates yaml file """
+    with open(infile, 'rb') as yamlfile:
+        return yaml.load(yamlfile)
+
 def setup_parser(parser):
     """Initializes parser"""
     subparsers = parser.add_subparsers(help='Import users from:')
@@ -97,6 +108,7 @@ def setup_parser(parser):
     csv_parser = subparsers.add_parser('csv', parents=[parent_parser], help='csv file')
     json_parser = subparsers.add_parser('json', parents=[parent_parser], help='json file')
     cli_parser = subparsers.add_parser('create', parents=[parent_parser], help='command line')
+    yaml_parser = subparsers.add_parser('yaml', parents=[parent_parser], help='yaml file')
 
     cli_parser.add_argument('--username', required=True, help='e.g. --username wwhite')
     cli_parser.add_argument('--email', required=True, help='e.g. --email wwhite@victorops.com')
@@ -108,6 +120,7 @@ def setup_parser(parser):
     cli_parser.add_argument('--teams', help='e.g. --teams team1:team_admin,team2:member')
     csv_parser.add_argument('-f', '--file', required=True, dest='csv', help='e.g. -f <foo.csv>')
     json_parser.add_argument('-f', '--file', required=True, dest='json', help='e.g. -f <foo.json>')
+    yaml_parser.add_argument('-f', '--file', required=True, dest='yaml', help='e.g. -f <foo.yaml>')
 
     return parser
 
